@@ -195,6 +195,11 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.logging)
+
     // ### Unit and Instrumented Test ###
     testImplementation(libs.junit)
 //    androidTestImplementation(libs.junit)
@@ -226,4 +231,5 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.karn.notify)
     implementation(libs.afollestad.material.dialogs.color)
+    implementation(libs.coil.kt.compose)
 }

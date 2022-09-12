@@ -1,9 +1,12 @@
 package com.ara.aranote.ui.screen.settings
 
+import com.ara.aranote.domain.usecase.repo_detail.GetRepoDetailUseCase
 import com.ara.aranote.domain.usecase.user_preferences.ObserveUserPreferencesUseCase
 import com.ara.aranote.domain.usecase.user_preferences.WriteUserPreferencesUseCase
 import com.ara.aranote.util.BaseViewModel
 import com.ara.aranote.util.HDataBackup
+import com.ara.aranote.util.REPO_NAME
+import com.ara.aranote.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -12,6 +15,7 @@ class SettingsViewModel
 @Inject constructor(
     private val observeUserPreferencesUseCase: ObserveUserPreferencesUseCase,
     private val writeUserPreferencesUseCase: WriteUserPreferencesUseCase,
+    private val getRepoDetailUseCase: GetRepoDetailUseCase,
     private val hDataBackup: HDataBackup,
 ) : BaseViewModel<SettingsState, SettingsIntent, SettingsSingleEvent>() {
 
@@ -19,6 +23,7 @@ class SettingsViewModel
 
     init {
         sendIntent(SettingsIntent.ObserveUserPreferences)
+        sendIntent(SettingsIntent.LoadRepoDetail)
     }
 
     override suspend fun handleIntent(intent: SettingsIntent, state: SettingsState) {
@@ -36,6 +41,15 @@ class SettingsViewModel
 
             is SettingsIntent.ExportData -> hDataBackup.importData(intent.uri, intent.onComplete)
             is SettingsIntent.ImportData -> hDataBackup.exportData(intent.uri, intent.onComplete)
+
+            is SettingsIntent.LoadRepoDetail ->
+                when (val result = getRepoDetailUseCase(REPO_NAME)) {
+                    is Result.Success -> sendIntent(SettingsIntent.ShowRepoDetail(result.data))
+                    is Result.Error -> {
+                        triggerSingleEvent(SettingsSingleEvent.ShowError(result.errorMessage))
+                    }
+                }
+            is SettingsIntent.ShowRepoDetail -> Unit
         }
     }
 
@@ -54,5 +68,8 @@ internal class SettingsReducer : BaseViewModel.Reducer<SettingsState, SettingsIn
 
             is SettingsIntent.ExportData -> state
             is SettingsIntent.ImportData -> state
+
+            is SettingsIntent.LoadRepoDetail -> state
+            is SettingsIntent.ShowRepoDetail -> state.copy(repo = intent.repo)
         }
 }

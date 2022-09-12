@@ -33,4 +33,16 @@
     <string name="cd_save">save</string>
     <string name="cd_delete_notebook">delete notebook</string>
 
+    <string name="api_errors_no_internet">There is no Internet connection</string>
+    <string name="api_errors_http403">The request is forbidden</string>
+    <string name="api_errors_undefined">Undefined error:\n%s</string>
+
+    <string name="repo_avatar_image">Repo\'s avatar Image</string>
+    <string name="screen_repodetail_owner">Owner: %s</string>
+    <string name="screen_repodetail_repoName">Repository Name: %s</string>
+    <string name="screen_repodetail_description">Description: %s</string>
+    <string name="screen_repodetail_watchers">Watchers: %s</string>
+    <string name="screen_repodetail_private">Private: %s</string>
+    <string name="open_repository">Open Repository</string>
+
 </resources>

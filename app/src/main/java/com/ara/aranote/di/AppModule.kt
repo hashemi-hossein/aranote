@@ -16,6 +16,8 @@ import com.ara.aranote.domain.repository.NoteRepository
 import com.ara.aranote.domain.repository.NotebookRepository
 import com.ara.aranote.domain.util.Mapper
 import com.ara.aranote.ui.main.BaseApplication
+import com.ara.aranote.util.ResourcesProvider
+import com.ara.aranote.util.ResourcesProviderImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,4 +60,10 @@ object AppModule {
     fun provideUserPreferencesStore(
         @ApplicationContext context: Context
     ): DataStore<UserPreferences> = context.userPreferencesStore
+
+    @Singleton
+    @Provides
+    fun provideResourcesProvider(
+        @ApplicationContext context: Context
+    ): ResourcesProvider = ResourcesProviderImpl(context)
 }

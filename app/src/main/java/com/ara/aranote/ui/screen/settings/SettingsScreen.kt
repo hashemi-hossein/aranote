@@ -3,6 +3,7 @@ package com.ara.aranote.ui.screen.settings
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.OpenInNewOff
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -41,8 +43,11 @@ import com.afollestad.materialdialogs.color.colorChooser
 import com.ara.aranote.R
 import com.ara.aranote.data.datastore.UserPreferences
 import com.ara.aranote.ui.component.HAppBar
+import com.ara.aranote.ui.component.RepoDetail
 import com.ara.aranote.ui.component.showSnackbar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -51,10 +56,21 @@ fun SettingsScreen(
     navigateUp: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.singleEvent.onEach {
+            when (it) {
+                is SettingsSingleEvent.ShowError ->
+                    Toast.makeText(context, it.errorMessage, Toast.LENGTH_LONG)
+                        .show()
+            }
+        }.collect()
+    }
 
     SettingsScreen(
         navigateUp = navigateUp,
-        userPreferences = uiState.userPreferences,
+        uiState = uiState,
         setIsDark = { viewModel.sendIntent(SettingsIntent.WriteUserPreferences(UserPreferences::isDark, it)) },
         setIsAutoSaveMode = {
             viewModel.sendIntent(SettingsIntent.WriteUserPreferences(UserPreferences::isAutoSaveMode, it))
@@ -77,7 +93,7 @@ fun SettingsScreen(
 @Composable
 internal fun SettingsScreen(
     navigateUp: () -> Unit,
-    userPreferences: UserPreferences,
+    uiState: SettingsState,
     setIsDark: (Boolean) -> Unit,
     setIsAutoSaveMode: (Boolean) -> Unit,
     setNoteColor: (Long) -> Unit,
@@ -100,18 +116,18 @@ internal fun SettingsScreen(
                 .padding(innerPadding)
         ) {
             ListItem(trailing = {
-                Switch(checked = userPreferences.isDark, onCheckedChange = setIsDark)
+                Switch(checked = uiState.userPreferences.isDark, onCheckedChange = setIsDark)
             }) {
                 Text(text = "Dark Theme")
             }
             ListItem(trailing = {
-                Switch(checked = userPreferences.isAutoSaveMode, onCheckedChange = setIsAutoSaveMode)
+                Switch(checked = uiState.userPreferences.isAutoSaveMode, onCheckedChange = setIsAutoSaveMode)
             }) {
                 Text(text = "Auto save Mode")
             }
             ListItem(trailing = {
                 Switch(
-                    checked = userPreferences.isDoubleBackToExitMode,
+                    checked = uiState.userPreferences.isDoubleBackToExitMode,
                     onCheckedChange = setIsDoubleBackToExitMode
                 )
             }) {
@@ -122,7 +138,7 @@ internal fun SettingsScreen(
                     modifier = Modifier
                         .size(35.dp)
                         .clip(CircleShape)
-                        .background(color = Color(userPreferences.noteColor))
+                        .background(color = Color(uiState.userPreferences.noteColor))
                         .clickable {
                             val colors = intArrayOf(
                                 android.graphics.Color.parseColor("#FF5722"),
@@ -143,7 +159,7 @@ internal fun SettingsScreen(
                             MaterialDialog(context).show {
                                 colorChooser(
                                     colors,
-                                    initialSelection = userPreferences.noteColor.toInt(),
+                                    initialSelection = uiState.userPreferences.noteColor.toInt(),
                                     allowCustomArgb = true,
                                 ) { _, color ->
 //                                println("color=$color")
@@ -205,6 +221,10 @@ internal fun SettingsScreen(
                 }
             }) {
                 Text(text = "Import Data")
+            }
+
+            if (uiState.repo != null) {
+                RepoDetail(repo = uiState.repo)
             }
         }
     }

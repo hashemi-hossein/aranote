@@ -8,3 +8,6 @@ const val DEFAULT_NOTEBOOK_NAME = "Ara Notebook"
 const val ANIMATION_DURATION = 500
 const val NAV_ARGUMENT_NOTE_ID = "noteId"
 const val NAV_ARGUMENT_NOTEBOOK_ID = "notebookId"
+const val BASE_URL = "https://api.github.com/"
+const val REPO_NAME = "ara-note"
+const val RepoBaseUrl = "https://github.com/hashemi-hossein/"
