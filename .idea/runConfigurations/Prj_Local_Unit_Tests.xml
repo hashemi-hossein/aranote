@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Prj Local Unit Tests" type="JUnit" factoryName="JUnit">
+    <module name="Ara_Note.app.unitTest" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="directory" />
+    <dir value="$PROJECT_DIR$/app/src/test" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
